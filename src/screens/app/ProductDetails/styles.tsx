@@ -1,0 +1,113 @@
+import {Dimensions, StatusBar, StyleSheet} from 'react-native';
+// import {colors} from '../../../utils/color';
+
+const {height} = Dimensions.get('window');
+
+export const styles = StyleSheet.create({
+  safe: {
+    flex: 1,
+    // backgroundColor: '#FFFF',
+  },
+  headerBackground: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 60,
+    backgroundColor: '#e9f7ea',
+    zIndex: 1,
+  },
+  footer: {
+    paddingHorizontal: 24,
+    paddingVertical: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '90%',
+    backgroundColor: 'transparent',
+  },
+  container: {
+    flex: 1,
+  },
+  Image: {
+    width: '100%',
+    height: height * 0.45,
+  },
+  content: {
+    backgroundColor: '#DFF2EB',
+    borderTopRightRadius: 24,
+    borderTopLeftRadius: 24,
+    marginTop: -40,
+    paddingHorizontal: 24,
+    paddingTop: 32,
+    paddingBottom: 50,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: -2},
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    minHeight: '100%',
+  },
+  title: {
+    marginTop: 8,
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#000',
+    letterSpacing: 0.5,
+  },
+  price: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    color: '#000',
+    marginVertical: 8,
+  },
+  description: {
+    color: 'black',
+    fontWeight: '400',
+    marginVertical: 16,
+    lineHeight: 20,
+    textAlign: 'justify',
+  },
+  stockContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 8,
+  },
+  stock: {
+    backgroundColor: '#8f918e',
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+    borderRadius: 12,
+    fontWeight: '600',
+    color: '#f0d02b',
+    overflow: 'hidden',
+  },
+  bookmarkContainer: {
+    backgroundColor: '#3f4540',
+    padding: 18,
+    borderRadius: 12,
+    marginRight: 16,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  bookmarkContainerActive: {
+    backgroundColor: '#212b24',
+  },
+  backContainer: {
+    backgroundColor: '#cdd1ce',
+    padding: 12,
+    margin: 24,
+    borderRadius: 12,
+    position: 'absolute',
+    top: StatusBar.currentHeight,
+    left: 0,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
+});
