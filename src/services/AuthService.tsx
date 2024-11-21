@@ -29,7 +29,7 @@ interface loginInterface {
 export const useRegister = () => {
   return useMutation(async (registerData: RegisterInterface) => {
     const response = await axios.post(
-      'http://192.168.68.173:9000/api/auth/register',
+      'http://192.168.1.104:9000/api/auth/register',
       registerData,
     );
     return response.data;
@@ -39,27 +39,34 @@ export const useRegister = () => {
 export const useLogin = () => {
   return useMutation(async (loginData: loginInterface) => {
     const response = await axios.post(
-      'http://192.168.68.173:9000/api/auth/login',
+      'http://192.168.1.104:9000/api/auth/login',
       loginData,
     );
     return response.data;
   });
 };
 
-export const comparePlant = () => {
+export const comparePlant = (userId: number) => {
   return useMutation(async (data: any) => {
     console.log('url', data);
     const response = await axios.post(
-      'http://192.168.68.173:9000/api/auth/compare-image',
+      `http://192.168.1.104:9000/api/auth/compare-image/${userId}`,
       {imageUrl: data},
     );
     return response.data;
   });
 };
 
+export const getHistory = async (userId: number) => {
+  const response = await axios.get(
+    `http://192.168.1.104:9000/api/auth/history/${userId}`,
+  );
+  return response.data;
+};
+
 export const getProfileDetails = async (authToken: string, userId: number) => {
   const response = await axios.get(
-    `http://192.168.68.173:9000/api/auth/getProfile/${userId}`,
+    `http://192.168.1.104:9000/api/auth/getProfile/${userId}`,
   );
   return response.data;
 };
@@ -73,7 +80,7 @@ export const updateProfile = async ({
   address,
 }: ProfileInterface) => {
   const response = await axios.put(
-    `http://192.168.68.173:9000/api/auth/profile/${userId}`,
+    `http://192.168.1.104:9000/api/auth/profile/${userId}`,
     {username: name, email: email, contactNumber: contact, address: address},
     {
       headers: {

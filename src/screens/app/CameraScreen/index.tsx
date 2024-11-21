@@ -17,11 +17,13 @@ import {request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 import axios from 'axios';
 import {comparePlant} from '../../../services/AuthService';
 import {useToast} from '../../../Context/ToastContext';
+import {useAuth} from '../../../Context';
 
 const CameraScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [responseData, setResponseData] = useState<any>();
   const [imageModal, setImageModal] = useState<boolean>(false);
+  const {userId} = useAuth();
 
   const requestCameraPermission = async () => {
     const permission: any = Platform.select({
@@ -33,7 +35,11 @@ const CameraScreen = () => {
     return result === RESULTS.GRANTED;
   };
 
-  const {mutate: compareImage, isLoading: plantLoading, error} = comparePlant();
+  const {
+    mutate: compareImage,
+    isLoading: plantLoading,
+    error,
+  } = comparePlant(userId);
 
   const {showToast} = useToast();
 
@@ -157,10 +163,14 @@ const CameraScreen = () => {
     <SafeAreaView style={styles.container}>
       <View style={styles.border}>
         {isLoading || plantLoading ? (
-          <Text style={{color: 'black'}}>
-            Waiting...
-            <ActivityIndicator size="large" color="#2d3b37" />
-          </Text>
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator
+              size="large"
+              color="#2d3b37"
+              style={styles.loader}
+            />
+            <Text style={styles.loadingText}>Processing...</Text>
+          </View>
         ) : (
           <View style={styles.buttonContainer}>
             <TouchableOpacity style={styles.button} onPress={openCamera}>
@@ -274,9 +284,9 @@ const styles = StyleSheet.create({
   },
   image: {
     width: 200,
-    height: 200,
+    height: 250,
     borderRadius: 10,
-    marginBottom: 20,
+    // marginBottom: 20,
   },
   title: {
     fontSize: 22,
@@ -305,6 +315,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     color: '#28a745',
+  },
+  loadingContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  loader: {
+    marginBottom: 10,
+  },
+  loadingText: {
+    color: '#2d3b37',
+    fontSize: 16,
   },
 });
 

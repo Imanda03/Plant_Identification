@@ -6,74 +6,52 @@ import {
   TouchableOpacity,
   RefreshControl,
   ScrollView,
+  Image,
+  Modal,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {styles} from './styles';
 import {Avatar} from 'react-native-elements';
-import {TextInput} from 'react-native-paper';
-import CategoryBox from '../../../components/CategoryBox';
-import ProductHomeItem from '../../../components/ProductHomeItem';
-import {useQuery, useQueryClient} from 'react-query';
+import {useQuery} from 'react-query';
 import {useAuth} from '../../../Context';
-import AnimatedBanner from '../../../components/AnimatedBanner';
-import ListComponent from '../../../components/List';
-interface RenderCategoryItemProps {
-  item: CategoryItem;
-  index: number;
-}
-
-interface CategoryItem {
-  id: any;
-  title: string;
-  image: string;
-}
-
-interface ProductItem {
-  title: string;
-  images: string[];
-  category: any;
-  price: string;
-  description?: string;
-}
-
-interface RenderProductItemProps {
-  item: ProductItem;
-  index: number;
-}
+import {getHistory} from '../../../services/AuthService';
 
 const HomeScreen = ({navigation}: any) => {
   const {authToken, userId} = useAuth();
-  const queryClient = useQueryClient();
-  const [selectedCategory, setSelectedCategory] = useState<any>();
-  const [keyword, setKeyword] = useState<string>('');
+  const [selectedPlant, setSelectedPlant] = useState<any>(null); // State to hold selected plant data
+  const [modalVisible, setModalVisible] = useState<boolean>(false); // State to manage modal visibility
   const [refreshing, setRefreshing] = useState(false);
 
-  const renderProductItem = ({item, index}: RenderProductItemProps) => {
-    const onProductPress = (product: any) => {
-      navigation.navigate('InnerScreen', {
-        screen: 'ProductDetails',
-        params: product,
-      });
-    };
-    return <ProductHomeItem onPress={() => onProductPress(item)} {...item} />;
-  };
+  const {data: historyData, refetch} = useQuery(['history', userId], () =>
+    getHistory(userId),
+  );
 
-  const handleChangeSearch = (value: string) => {
-    setKeyword(value);
-  };
-
-  const bannerImages = [
-    'https://img.freepik.com/free-vector/gradient-supermarket-social-media-promo-template_23-2149361392.jpg?semt=ais_hybrid',
-    'https://img.freepik.com/free-vector/gradient-supermarket-sale-background_23-2149381867.jpg',
-    'https://img.freepik.com/free-vector/gradient-sale-landing-page-with-photo_52683-68514.jpg',
-  ];
+  console.log('sele', selectedPlant);
+  const renderHistoryItem = ({item}: {item: any}) => (
+    <TouchableOpacity
+      style={styles.historyItemContainer}
+      onPress={() => {
+        setSelectedPlant(item.plantData); // Set the selected plant data
+        setModalVisible(true); // Open modal
+      }}>
+      <Image
+        source={{uri: item.plantData.imageUrl}}
+        style={styles.historyItemImage}
+      />
+      <View style={styles.historyItemTextContainer}>
+        <Text style={styles.historyItemTitle}>{item.plantData.name}</Text>
+        <Text style={styles.historyItemCategory}>
+          Category: {item.plantData.category}
+        </Text>
+      </View>
+    </TouchableOpacity>
+  );
 
   const handleRefresh = () => {
     setRefreshing(true);
-    queryClient.invalidateQueries('recommendedProducts', authToken, userId);
-    queryClient.invalidateQueries('products', authToken);
-    queryClient.invalidateQueries('category', authToken);
-
+    refetch();
     setRefreshing(false);
   };
 
@@ -84,6 +62,7 @@ const HomeScreen = ({navigation}: any) => {
           <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
         }>
         <View>
+          {/* App Description Section */}
           <View style={styles.topView}>
             <View style={styles.textContainer}>
               <Text style={styles.text}>Plant</Text>
@@ -98,11 +77,68 @@ const HomeScreen = ({navigation}: any) => {
               icon={{name: 'home'}}
             />
           </View>
-          <View>
-            <ListComponent />
+
+          <View style={styles.appDescriptionContainer}>
+            <Text style={styles.appDescriptionTitle}>
+              Welcome to Plant Identifiers
+            </Text>
+            <Text style={styles.appDescriptionText}>
+              This app allows you to view and manage your plant identification
+              history. Explore recent plant identifications, browse plant
+              details, and track your plant data.
+            </Text>
+          </View>
+
+          {/* History Section */}
+          <View style={styles.historySection}>
+            <Text style={styles.historySectionTitle}>
+              {historyData?.length > 0 ? 'Recent Identifications' : ''}
+            </Text>
+            <FlatList
+              data={historyData && historyData?.length > 0 ? historyData : []}
+              renderItem={renderHistoryItem}
+              keyExtractor={item => item.id.toString()}
+              numColumns={2}
+              columnWrapperStyle={{
+                justifyContent: 'space-between',
+                marginBottom: 16,
+              }} // Adds vertical and horizontal spacing
+              showsHorizontalScrollIndicator={false}
+              ListFooterComponent={
+                <View style={{marginBottom: 100}} /> // Empty footer to add space at the bottom
+              }
+              contentContainerStyle={{paddingHorizontal: 16, paddingTop: 16}} // Padding for the entire list
+            />
           </View>
         </View>
       </ScrollView>
+
+      {/* Modal for Plant Description */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}>
+        <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContainer}>
+              <Text style={styles.modalTitle}>{selectedPlant?.name}</Text>
+              <Image
+                source={{uri: selectedPlant?.imageUrl}}
+                style={styles.modalImage}
+              />
+              <Text style={styles.modalDescription}>
+                {selectedPlant?.description}
+              </Text>
+              <TouchableOpacity
+                style={styles.closeModalButton}
+                onPress={() => setModalVisible(false)}>
+                <Text style={styles.closeModalButtonText}>Close</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
     </SafeAreaView>
   );
 };
